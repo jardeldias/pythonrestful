@@ -6,3 +6,7 @@ Flask
 SQL Alchemy
 Marshmallow
 MySQL
+
+Pycharm IDE
+Insomnia, para realizar as requsições HTPP
+DBeaver, para gerenciar o banco de dados
