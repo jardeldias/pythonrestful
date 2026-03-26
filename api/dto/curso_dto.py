@@ -4,3 +4,4 @@ from dataclasses import dataclass
 class CursoDTO:
     nome: str
     descricao: str
+    disciplinas: list
