@@ -7,10 +7,17 @@ from api.service import turma_service
 from flask import request, make_response, jsonify
 
 class TurmaController(Resource):
-    def get(self):
-        turmas = turma_service.listar_turmas()
-        validate = turma_schema.TurmaSchema(many=True)
-        return make_response(validate.jsonify(turmas), 200)
+    def get(self, id=None):
+        if id is None:
+            turmas = turma_service.listar_turmas()
+            validate = turma_schema.TurmaSchema(many=True)
+            return make_response(validate.jsonify(turmas), 200)
+        else:
+            turma = turma_service.listar_turmas_by_id(id)
+            if turma is None:
+                return make_response(jsonify('Turma não encontrada.'))
+            validate = turma_schema.TurmaSchema()
+            return make_response(validate.jsonify(turma), 200)
 
     def post(self):
         turma_schema_var = turma_schema.TurmaSchema()
@@ -59,14 +66,4 @@ class TurmaController(Resource):
         turma_service.excluir_turma(turmadb)
         return make_response("Turma excluida com sucesso", 204)
 
-class TurmaDetailController(Resource):
-    def get(self, id):
-        turma = turma_service.listar_turmas_by_id(id)
-        if turma is None:
-            return make_response(jsonify("Turma não encontrada"), 404)
-        validate = turma_schema.TurmaSchema()
-        return make_response(validate.jsonify(turma), 200)
-
-api.add_resource(TurmaController, '/turma', endpoint='turmaGET')
-api.add_resource(TurmaController, '/turma/<int:id>', endpoint='turmaPUT_DELETE', methods=['PUT', 'DELETE'])
-api.add_resource(TurmaDetailController, '/turma/<int:id>', endpoint='getID')
+api.add_resource(TurmaController, '/turma', '/turma/<int:id>')
