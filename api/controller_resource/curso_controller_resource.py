@@ -6,10 +6,17 @@ from api.service import curso_service
 from flask import request, make_response, jsonify
 
 class CursoControllerResource(Resource):
-    def get(self):
-        cursos = curso_service.listar_curso()
-        validate = curso_schema.CursoSchema(many=True)
-        return make_response(validate.jsonify(cursos), 200)
+    def get(self, id=None):
+        if id is None:
+            cursos = curso_service.listar_curso()
+            validate = curso_schema.CursoSchema(many=True)
+            return make_response(validate.jsonify(cursos), 200)
+        else:
+            curso = curso_service.listar_curso_by_id(id)
+            if curso is None:
+                return make_response(jsonify('Curso não encontrado'), 404)
+            validate = curso_schema.CursoSchema()
+            return make_response(validate.jsonify(curso), 200)
 
     def post(self):
         curso_schema_var  = curso_schema.CursoSchema()
@@ -55,14 +62,4 @@ class CursoControllerResource(Resource):
         # 204 é um response que não retorna corpo na página
         return make_response('Curso expluido com sucesso',200)
 
-class CursoDetailControllerResource(Resource):
-    def get(self, id):
-        curso = curso_service.listar_curso_by_id(id)
-        if curso is None:
-            return make_response(jsonify('Curso não encontrado'), 404)
-        validate = curso_schema.CursoSchema()
-        return make_response(validate.jsonify(curso), 200)
-
-api.add_resource(CursoControllerResource,'/curso', endpoint='cursoGetPost', methods=['GET','POST'])
-api.add_resource(CursoControllerResource,'/curso/<int:id>', endpoint='cursoPutDelte', methods=['PUT', 'DELETE'])
-api.add_resource(CursoDetailControllerResource,'/curso/<int:id>', endpoint='cursoGetId', methods=['GET'])
+api.add_resource(CursoControllerResource,'/curso', '/curso/<int:id>')
