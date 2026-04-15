@@ -6,10 +6,18 @@ from api.dto import professor_dto
 from flask import request, make_response, jsonify
 
 class ProfessorController(Resource):
-    def get(self):
-        professores = professor_service.listar_professor()
-        validate = professor_schema.ProfessorSchema(many=True)
-        return make_response(validate.jsonify(professores), 200)
+    def get(self, id=None):
+        if id is None:
+            professores = professor_service.listar_professor()
+            validate = professor_schema.ProfessorSchema(many=True)
+            return make_response(validate.jsonify(professores), 200)
+        else:
+            professor = professor_service.listar_professor_by_id(id)
+            if professor is None:
+                return make_response(jsonify('Professor não encontrado.'))
+            validate = professor_schema.ProfessorSchema()
+            return make_response(validate.jsonify(professor), 200)
+
     def post(self):
         professor_schema_var = professor_schema.ProfessorSchema()
         validate = professor_schema_var.validate(request.json)
@@ -49,14 +57,4 @@ class ProfessorController(Resource):
         professor_service.excluir_professor(professordb)
         return make_response("Professor excluido com sucesso", 204)
 
-class ProfessorDetailController(Resource):
-    def get(self, id):
-        professor = professor_service.listar_professor_by_id(id)
-        if professor is None:
-            return make_response(jsonify("Aluno não encontrado"), 404)
-        validate = professor_schema.ProfessorSchema()
-        return make_response(validate.jsonify(professor), 200)
-
-api.add_resource(ProfessorController,'/professor')
-api.add_resource(ProfessorController,'/professor/<int:id>', endpoint='alterarExcluirProfessor', methods=["PUT", 'DELETE'])
-api.add_resource(ProfessorDetailController,'/professor/<int:id>')
+api.add_resource(ProfessorController,'/professor', '/professor/<int:id>')
