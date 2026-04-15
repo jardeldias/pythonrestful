@@ -6,6 +6,7 @@ from flask_marshmallow import Marshmallow
 app = Flask(__name__)
 app.config.from_object('config')
 api = Api(app)
+app.json.ensure_ascii = False
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
